@@ -1,0 +1,51 @@
+Feature Name
+num__TotalVisits
+num__Total Time Spent on Website
+num__Page Views Per Visit
+cat__Lead Origin_Landing Page Submission
+cat__Lead Origin_Lead Add Form
+cat__Lead Origin_Other
+cat__Lead Source_direct traffic
+cat__Lead Source_facebook
+cat__Lead Source_google
+cat__Lead Source_olark chat
+cat__Lead Source_organic search
+cat__Lead Source_reference
+cat__Lead Source_referral sites
+cat__Lead Source_welingak website
+cat__Do Not Email_Yes
+cat__Last Activity_Email Bounced
+cat__Last Activity_Email Link Clicked
+cat__Last Activity_Email Opened
+cat__Last Activity_Form Submitted on Website
+cat__Last Activity_Had a Phone Conversation
+cat__Last Activity_Olark Chat Conversation
+cat__Last Activity_Other
+cat__Last Activity_Page Visited on Website
+cat__Last Activity_SMS Sent
+cat__Last Activity_Unknown
+cat__Last Activity_Unreachable
+cat__Last Activity_Unsubscribed
+cat__Specialization_Business Administration
+cat__Specialization_E-Business
+cat__Specialization_E-COMMERCE
+cat__Specialization_Finance Management
+cat__Specialization_Healthcare Management
+cat__Specialization_Hospitality Management
+cat__Specialization_Human Resource Management
+cat__Specialization_IT Projects Management
+cat__Specialization_International Business
+cat__Specialization_Marketing Management
+cat__Specialization_Media and Advertising
+cat__Specialization_Operations Management
+cat__Specialization_Retail Management
+cat__Specialization_Rural and Agribusiness
+cat__Specialization_Services Excellence
+cat__Specialization_Supply Chain Management
+cat__Specialization_Travel and Tourism
+cat__Specialization_Unknown
+cat__What is your current occupation_Student
+cat__What is your current occupation_Unemployed
+cat__What is your current occupation_Unknown
+cat__What is your current occupation_Working Professional
+cat__A free copy of Mastering The Interview_Yes
