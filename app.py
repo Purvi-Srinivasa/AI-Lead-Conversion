@@ -844,6 +844,69 @@ elif page == "Predict a Lead":
                         )
 
 
+            # =========================================================
+            # DOWNLOADABLE PREDICTION REPORT
+            # =========================================================
+
+            st.divider()
+            st.subheader("Download Prediction Report")
+
+            lead_details = st.session_state.get("active_lead", {})
+            ai_result = st.session_state.get("ai_result", {})
+
+            report_lines = [
+                "LEADPULSE - LEAD CONVERSION PREDICTION REPORT",
+                "=" * 55,
+                "",
+                f"Conversion Probability: {prob:.2%}",
+                f"Lead Priority: {cat}",
+                "",
+                "LEAD ATTRIBUTES",
+                "-" * 30
+            ]
+
+            for feature, value in lead_details.items():
+                report_lines.append(f"{feature}: {value}")
+
+            report_lines.extend([
+                "",
+                "AI EXPLANATION",
+                "-" * 30,
+                str(ai_result.get(
+                    "explanation",
+                    "AI explanation was not generated."
+                )),
+                "",
+                "RECOMMENDED SALES ACTION",
+                "-" * 30,
+                str(ai_result.get(
+                    "recommendation",
+                    "AI recommendation was not generated."
+                )),
+                "",
+                "FOLLOW-UP STRATEGY",
+                "-" * 30,
+                str(ai_result.get(
+                    "follow_up",
+                    "AI follow-up strategy was not generated."
+                )),
+                "",
+                "DISCLAIMER",
+                "This conversion probability is a model estimate, "
+                "not a guarantee of conversion."
+            ])
+
+            report_text = "\n".join(report_lines)
+
+            st.download_button(
+                label="Download Lead Prediction Report",
+                data=report_text,
+                file_name="LeadPulse_Prediction_Report.txt",
+                mime="text/plain",
+                type="primary",
+                use_container_width=True
+            )
+
 # =========================================================
 # 14. AI SALES ASSISTANT
 # =========================================================
@@ -1021,6 +1084,140 @@ elif page == "Model Insights":
             "Add Member 2's verified Model_Comparison_Verified.csv "
             "to this folder."
         )
+
+    # =========================================================
+    # CONFUSION MATRIX
+    # =========================================================
+
+    st.divider()
+    st.subheader("Confusion Matrix - XGBoost Classifier")
+
+    x_test_path = BASE / "X_test_processed.pkl"
+    y_test_path = BASE / "y_test.pkl"
+
+    if x_test_path.exists() and y_test_path.exists():
+        try:
+            from sklearn.metrics import confusion_matrix
+
+            X_test = joblib.load(x_test_path)
+            y_test = np.asarray(joblib.load(y_test_path)).ravel()
+
+            model = joblib.load(MODEL_PATH)
+            y_pred = model.predict(X_test)
+
+            cm = confusion_matrix(
+                y_test,
+                y_pred,
+                labels=[0, 1]
+            )
+
+            fig_cm = go.Figure(
+                data=go.Heatmap(
+                    z=cm,
+                    x=["Not Converted", "Converted"],
+                    y=["Not Converted", "Converted"],
+                    text=cm,
+                    texttemplate="%{text}",
+                    colorscale="Blues",
+                    showscale=True
+                )
+            )
+
+            fig_cm.update_layout(
+                title="Actual vs Predicted Lead Outcomes",
+                xaxis_title="Predicted Outcome",
+                yaxis_title="Actual Outcome",
+                height=450
+            )
+
+            st.plotly_chart(
+                fig_cm,
+                use_container_width=True
+            )
+
+            st.caption(
+                "Evaluation uses the original saved test features "
+                "and actual test labels."
+            )
+
+        except Exception as e:
+            st.error(f"Could not generate confusion matrix: {e}")
+
+    else:
+        st.warning(
+            "X_test_processed.pkl or y_test.pkl is missing."
+        )
+    
+    # =========================================================
+    # FEATURE IMPORTANCE ANALYSIS
+    # =========================================================
+
+    st.divider()
+    st.subheader("Feature Importance Analysis - XGBoost")
+
+    feature_names_path = BASE / "processed_feature_names.csv"
+
+    if feature_names_path.exists():
+        try:
+            model = joblib.load(MODEL_PATH)
+
+            feature_df = pd.read_csv(feature_names_path)
+
+            importance_df = pd.DataFrame({
+                "Feature": feature_df["Feature Name"],
+                "Importance": model.feature_importances_
+            })
+
+            importance_df = importance_df.sort_values(
+                by="Importance",
+                ascending=False
+            )
+
+            top_features = importance_df.head(10).sort_values(
+                by="Importance",
+                ascending=True
+            )
+
+            fig_importance = px.bar(
+                top_features,
+                x="Importance",
+                y="Feature",
+                orientation="h",
+                title="Top 10 Features Influencing Model Predictions",
+                labels={
+                    "Importance": "Relative Importance",
+                    "Feature": "Lead Attributes"
+                }
+            )
+
+            fig_importance.update_layout(
+                height=550,
+                yaxis_title="Lead Attributes",
+                xaxis_title="Relative Importance"
+            )
+
+            st.plotly_chart(
+                fig_importance,
+                use_container_width=True
+            )
+
+            with st.expander("View all 50 feature importance scores"):
+                st.dataframe(
+                    importance_df,
+                    use_container_width=True,
+                    hide_index=True
+                )
+
+            st.caption(
+                "Feature importance represents the model's relative "
+                "use of each feature. It does not establish causation."
+            )
+
+        except Exception as e:
+            st.error(f"Could not generate feature importance: {e}")
+
+    else:
+        st.warning("processed_feature_names.csv is missing.")
 
     st.markdown("#### Priority thresholds")
 
